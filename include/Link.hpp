@@ -7,17 +7,20 @@
 class Link {
 public:
 
-  Link(const Eigen::Vector2d mean, const Eigen::MatrixXd cov);
+  Link(const size_t index, const Eigen::Vector3d mean, const Eigen::Matrix3d cov);
   ~Link();
 
-  const Eigen::Vector2d getMean() {return mMean;}
-  const Eigen::MatrixXd getCov() {return mCov;}
-
+  void updateParameters(const Eigen::Vector3d translation, const Eigen::Matrix3d rotation);
   void printParameters();
+  const std::string getName() { return mName; }
+  const Eigen::Vector3d getMean() { return mMean; }
 
 private:
-  const Eigen::Vector2d mMean;
-  const Eigen::MatrixXd mCov;
+  std::string mName;
+  const Eigen::Vector3d mInitialMean;
+  const Eigen::Matrix3d mInitialCov;
+  Eigen::Vector3d mMean;
+  Eigen::Matrix3d mCov;
 };
 
 #endif // !LINK_HPP

@@ -10,17 +10,21 @@ Robot::Robot(const int numberOfJoints, const std::string urdfFile)
   mData = data;
 
 
-  const Eigen::Vector2d mean0(0, 0.5);
-  Eigen::MatrixXd cov0(2, 2);
+  const Eigen::Vector3d mean0(0, 0.5, 0);
+  Eigen::Matrix3d cov0(3, 3);
   cov0(0,0) = 0.1;
-  cov0(1,0) = 0;
+  cov0(1,0) = 0.2;
+  cov0(2,0) = 0.3;
   cov0(0,1) = 0;
   cov0(1,1) = 0.1;
+  cov0(2,1) = 0.0;
+  cov0(0,2) = 0.4;
+  cov0(1,2) = 0.0;
+  cov0(2,2) = 0.1;
 
   for (size_t i = 0; i < mNumberOfJoints; i++)
   {
-    Eigen::Vector2d offset(0, i);
-    Link link(mean0 + offset, cov0);
+    Link link(i+1, mean0, cov0);
     mLinks.push_back(link);
   }
   
@@ -34,7 +38,7 @@ void Robot::displayLinks()
 {
   for (size_t i {0}; i < mNumberOfJoints; i++)
   {
-    std::cout << "Link " << i << ": ";
+    std::cout << "Link " << i << ":\n";
     mLinks[i].printParameters();
   }
 }
@@ -42,6 +46,18 @@ void Robot::displayLinks()
 void Robot::move(const Eigen::VectorXd jointConfiguration)
 {
   pinocchio::forwardKinematics(mModel, mData, jointConfiguration);
-  std::cout << mData.oMi[2].translation().transpose() << std::endl;
+  pinocchio::updateFramePlacements(mModel, mData);
+
+  for (auto& link: mLinks)
+  {
+    size_t frameId = mModel.getFrameId(link.getName());
+    Eigen::Vector3d translation = mData.oMf[frameId].translation();
+    Eigen::Matrix3d rotation = mData.oMf[frameId].rotation();
+    link.updateParameters(translation, rotation);
+  }
+
+  displayLinks();
+
 
 }
+
