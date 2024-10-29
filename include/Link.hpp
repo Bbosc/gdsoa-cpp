@@ -13,6 +13,8 @@ public:
   const Eigen::Vector2d getMean() {return mMean;}
   const Eigen::MatrixXd getCov() {return mCov;}
 
+  void printParameters();
+
 private:
   const Eigen::Vector2d mMean;
   const Eigen::MatrixXd mCov;
