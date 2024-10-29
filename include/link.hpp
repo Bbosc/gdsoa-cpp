@@ -14,6 +14,7 @@ public:
   void printParameters();
   const std::string getName() { return mName; }
   const Eigen::Vector3d getMean() { return mMean; }
+  const Eigen::Matrix3d getCov() { return mCov; }
 
 private:
   std::string mName;

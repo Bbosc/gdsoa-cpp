@@ -3,7 +3,7 @@
 
 #include <vector>
 #include <string>
-#include "Link.hpp"
+#include "link.hpp"
 #include "pinocchio/parsers/urdf.hpp"
 #include "pinocchio/algorithm/joint-configuration.hpp"
 #include "pinocchio/algorithm/kinematics.hpp"
@@ -20,6 +20,7 @@ public:
   void displayLinks();
 
   void move(const Eigen::VectorXd jointConfiguration);
+  std::vector<Link> getLinks() { return mLinks; }
 
 private:
   int mNumberOfJoints;

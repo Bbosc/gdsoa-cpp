@@ -1,4 +1,4 @@
-#include "Link.hpp"
+#include "link.hpp"
 
 
 Link::Link(const size_t index, const Eigen::Vector3d mean, const Eigen::Matrix3d cov)

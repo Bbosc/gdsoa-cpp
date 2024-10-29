@@ -13,6 +13,6 @@ include_directories(include)
 include_directories(${EigenPath})
 include_directories(${pinocchioPath})
 
-add_executable(main src/Link.cpp src/Robot.cpp src/main.cpp)
+add_executable(main src/link.cpp src/robot.cpp src/distribution.cpp src/main.cpp)
 target_link_libraries(main PUBLIC pinocchio::pinocchio)
 
