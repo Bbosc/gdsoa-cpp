@@ -10,9 +10,10 @@ set(EigenPath "/usr/local/include/eigen3/")
 set(pinocchioPath "/opt/openrobots/include/")
 
 include_directories(include)
+include_directories(utils)
 include_directories(${EigenPath})
 include_directories(${pinocchioPath})
 
-add_executable(main src/link.cpp src/robot.cpp src/distribution.cpp src/main.cpp)
+add_executable(main src/link.cpp src/robot.cpp src/distribution.cpp utils/file_manager.cpp src/main.cpp)
 target_link_libraries(main PUBLIC pinocchio::pinocchio)
 

@@ -5,10 +5,12 @@
 #include <vector>
 #include <fstream>
 #include <iostream>
+#include <Eigen/Dense>
+
 
 
 template <typename T>
-int writeVectorToFile(const std::string filename, const T data);
+void writeVectorsToFile(const std::string filename, const std::vector<T> data);
 
 
 

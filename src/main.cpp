@@ -1,6 +1,9 @@
 #include <math.h>
 #include "robot.hpp"
 #include "distribution.hpp"
+#include "file_manager.hpp"
+
+
 
 
 int main (int argc, char *argv[]) {
@@ -27,12 +30,13 @@ int main (int argc, char *argv[]) {
         collisionProbability += computeMultivariateDistribution(
           obstaclePosition, robot.getLinks()[k].getMean(), robot.getLinks()[k].getCov()); 
       }
-      std::cout << collisionProbability << '\n';
       Eigen::Vector3d location (angles[i], angles[j], collisionProbability);
       probabilityMap.push_back(location);
-
     }
   }
+  
+  writeVectorsToFile<Eigen::Vector3d>("test.txt", probabilityMap);
+
 
   return 0;
 }
