@@ -10,12 +10,12 @@ int main (int argc, char *argv[]) {
 
   double minAngle {-M_PI/2};
   double maxAngle {M_PI/2};
-  size_t resolution {10};
+  size_t resolution {100};
   std::vector<double> angles {linspace(minAngle, maxAngle, resolution)};
 
   Robot robot(2, std::string("../description/2_joints_arm.urdf"));
 
-  Eigen::Vector3d obstaclePosition(0.1, 0.5, 0);
+  Eigen::Vector3d obstaclePosition(-0.5, 1.4, 0);
   std::vector<Eigen::Vector3d> probabilityMap;
 
   for (size_t i{0}; i < angles.size(); i++)
@@ -35,7 +35,7 @@ int main (int argc, char *argv[]) {
     }
   }
   
-  writeVectorsToFile<Eigen::Vector3d>("test.txt", probabilityMap);
+  writeVectorsToFile<Eigen::Vector3d>("test.csv", probabilityMap);
 
 
   return 0;
