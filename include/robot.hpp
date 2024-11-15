@@ -29,4 +29,6 @@ private:
   pinocchio::Data mData;
 };
 
+Eigen::MatrixXd derivateLocalRotation(const Eigen::Vector3d rotationAxis, const Eigen::MatrixXd rotation);
+
 #endif // !ROBOT_HPP
