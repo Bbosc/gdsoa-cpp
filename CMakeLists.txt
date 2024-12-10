@@ -5,6 +5,7 @@ set(CMAKE_CXX_STANDARD 14) # at least 14 is needed for Eigen
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_CXX_FLAGS_DEBUG "-g")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 find_package(pinocchio REQUIRED)
 

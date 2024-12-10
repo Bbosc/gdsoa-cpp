@@ -1,8 +1,8 @@
 #include "link.hpp"
 
 
-Link::Link(const size_t index, const Eigen::Vector3d mean, const Eigen::Matrix3d cov)
-  : mInitialMean{mean}, mInitialCov{cov}, mMean{mean}, mCov{cov}, mIndex{index}
+Link::Link(const size_t index, const Mean mu, const Cov sigma)
+  : mInitialMean{mu}, mInitialCov{sigma}, mMean{mu}, mCov{sigma}, mIndex{index}
 {
   mName = std::string("link") + std::to_string(index);
 }
@@ -11,18 +11,28 @@ Link::~Link()
 {
 }
 
-void Link::updateParameters(const Eigen::Vector3d translation, const Eigen::Matrix3d rotation, const Eigen::MatrixXd J, const Eigen::MatrixXd localRotation)
+void Link::updateParameters(const Tra T, const Rot R)
 {
-  Eigen::Vector3d updatedMean = translation + rotation * mInitialMean;
-  mMean = updatedMean;
-  Eigen::MatrixXd updatedCov = rotation * mInitialCov * rotation.transpose();
-  mCov = updatedCov;
-  Eigen::Vector3d rotationAxis = J(Eigen::seq(3, Eigen::indexing::last), getIndex()-1);
-  Eigen::MatrixXd rotationLocalDerivate = derivateLocalRotation(rotationAxis, localRotation);
+	Eigen::Vector3d updatedMean = T + R * mInitialMean;
+	mMean = updatedMean;
+	Eigen::MatrixXd updatedCov = R * mInitialCov * R.transpose();
+	mCov = updatedCov;
+	//Eigen::Vector3d rotationAxis = J(Eigen::seq(3, Eigen::indexing::last), getIndex()-1);
+	//Eigen::MatrixXd relativeRotationDerivate = derivateRelativeRotation(rotationAxis, localRotation);
+}
+
+Eigen::MatrixXd derivateMu(const Eigen::MatrixXd dR, const Mean mu, const Eigen::MatrixXd dT)
+{
+	return dT + dR * mu;
+}
+
+Eigen::MatrixXd derivateSigma(const Rot R, const Eigen::MatrixXd dR, const Cov sigma)
+{
+	return dR * sigma * R + R * sigma * dR;
 }
 
 
-Eigen::MatrixXd Link::derivateLocalRotation(const Eigen::Vector3d rotationAxis, const Eigen::MatrixXd rotation) {
+Eigen::MatrixXd Link::derivateRelativeRotation(const Eigen::Vector3d rotationAxis, const Eigen::MatrixXd rotation) {
   Eigen::MatrixXd skewedRotationAxis (rotation.rows(), rotation.cols());
   skewedRotationAxis << 0, -rotationAxis(2), rotationAxis(1),
                 rotationAxis(2), 0, -rotationAxis(0),
@@ -30,6 +40,17 @@ Eigen::MatrixXd Link::derivateLocalRotation(const Eigen::Vector3d rotationAxis, 
   return skewedRotationAxis * rotation;
 }
 
+Eigen::MatrixXd Link::derivateMuFirstOrder(
+	const Eigen::Vector3d mu, const Eigen::MatrixXd dR, const Eigen::MatrixXd J
+) {
+	return J + dR * mu;
+}
+
+Eigen::MatrixXd derivateSigmaFirstOrder(
+	const Eigen::MatrixXd sigma, const Eigen::MatrixXd r, const Eigen::MatrixXd dr
+) {
+	return dr * sigma * r + r * sigma * dr;
+}
 
 void Link::printParameters()
 {

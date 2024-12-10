@@ -4,8 +4,6 @@
 #include "file_manager.hpp"
 
 
-
-
 int main (int argc, char *argv[]) {
 
   double minAngle {-M_PI/3};

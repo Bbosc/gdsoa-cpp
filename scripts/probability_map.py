@@ -7,7 +7,6 @@ from matplotlib import cm
 
 if __name__ == '__main__':
     probability_map = pd.read_csv("build/test.csv", header=None).values
-    print(probability_map)
     
     fig = plt.figure()
     ax = fig.add_subplot()
@@ -20,5 +19,4 @@ if __name__ == '__main__':
     ax.set_ylim([x2.min(), x2.max()])
     ax.set_aspect('equal', 'box')
     plt.show()
-
 
