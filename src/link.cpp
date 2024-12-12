@@ -40,17 +40,6 @@ Eigen::MatrixXd Link::derivateRelativeRotation(const Eigen::Vector3d rotationAxi
   return skewedRotationAxis * rotation;
 }
 
-Eigen::MatrixXd Link::derivateMuFirstOrder(
-	const Eigen::Vector3d mu, const Eigen::MatrixXd dR, const Eigen::MatrixXd J
-) {
-	return J + dR * mu;
-}
-
-Eigen::MatrixXd derivateSigmaFirstOrder(
-	const Eigen::MatrixXd sigma, const Eigen::MatrixXd r, const Eigen::MatrixXd dr
-) {
-	return dr * sigma * r + r * sigma * dr;
-}
 
 void Link::printParameters()
 {

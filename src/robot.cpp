@@ -46,23 +46,13 @@ void Robot::move(const Eigen::VectorXd jointConfiguration)
 {
 	pinocchio::forwardKinematics(mModel, mData, jointConfiguration);
 	pinocchio::updateFramePlacements(mModel, mData);
-	std::vector<Eigen::MatrixXd> rotations(mModel.nv);
-	// R for absolute rotation, r for relative rotation
-	for (Link& link: mLinks)
-	{
+
+	for (Link& link: mLinks) {
 		size_t frameId = mModel.getFrameId(link.getName());
 		Eigen::Vector3d translation = mData.oMf[frameId].translation();
 		Eigen::Matrix3d R = mData.oMf[frameId].rotation();
-		rotations[link.getIndex()-1] = R;
-		Eigen::MatrixXd J(6, mModel.nv);
-		pinocchio::computeFrameJacobian(mModel, mData, jointConfiguration, frameId, J);
-		// first order derivation of rotation
-		Eigen::Vector3d rotationAxis = J(Eigen::seq(3, Eigen::indexing::last), link.getIndex()-1);
-		Eigen::MatrixXd relativeRotation = (link.getIndex()==1) ? R : R * rotations[0].inverse();
-		link.updateParameters(translation, R, J, relativeRotation);
-
+		link.updateParameters(translation, R);
 	}
-
 }
 
 
