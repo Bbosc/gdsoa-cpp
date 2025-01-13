@@ -1,3 +1,8 @@
+*.vim
+*.csv
 build/
+Debug/
 venv/
+.cache/
 .clangd
+changelog.md

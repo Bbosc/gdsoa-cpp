@@ -1,38 +1,49 @@
 #include "link.hpp"
 
 
-Link::Link(const size_t index, const Mean mu, const Cov sigma)
-  : mInitialMean{mu}, mInitialCov{sigma}, mMean{mu}, mCov{sigma}, mIndex{index}
+Link::Link(const Mean mu, const Cov sigma, const size_t index)
+  : initialMean{mu}, initialCov{sigma}, mean{mu}, cov{sigma}
 {
-  mName = std::string("link") + std::to_string(index);
+  name = std::string("link") + std::to_string(index);
 }
 
 Link::~Link()
 {
 }
 
-void Link::updateParameters(const Tra T, const Rot R)
+void Link::updateParameters(const Tra T, const Rot R, const Eigen::MatrixXd J)
 {
-	Eigen::Vector3d updatedMean = T + R * mInitialMean;
-	mMean = updatedMean;
-	Eigen::MatrixXd updatedCov = R * mInitialCov * R.transpose();
-	mCov = updatedCov;
+	mean = T + R * initialMean;
+	cov = R * initialCov * R.transpose();
+	this->R = R;
+	this->T = T;
+	dT = J.topRows(3);
+	p = dist::computeMultivariateDistribution(mean, cov);
 	//Eigen::Vector3d rotationAxis = J(Eigen::seq(3, Eigen::indexing::last), getIndex()-1);
 	//Eigen::MatrixXd relativeRotationDerivate = derivateRelativeRotation(rotationAxis, localRotation);
 }
 
-Eigen::MatrixXd derivateMu(const Eigen::MatrixXd dR, const Mean mu, const Eigen::MatrixXd dT)
-{
-	return dT + dR * mu;
+Eigen::MatrixXd Link::deriveCollision(const Eigen::MatrixXd dR, const Eigen::MatrixXd dT) {
+	Eigen::Vector3d diff = dist::obstaclePosition - mean;
+	Eigen::Vector3d dpdmu = dist::deriveCollisionMu(p, cov, diff);
+	Eigen::Matrix3d dpdsigma = dist::deriveCollisionSigma(p, cov, diff);
+	Eigen::Vector3d dmudq = deriveMu(dR, dT);
+	Eigen::Matrix3d dsigmadq = deriveSigma(dR);
+	return dpdmu * dmudq.transpose() + dpdsigma * dsigmadq;
 }
 
-Eigen::MatrixXd derivateSigma(const Rot R, const Eigen::MatrixXd dR, const Cov sigma)
+Eigen::Vector3d Link::deriveMu(const Eigen::MatrixXd dR, const Eigen::MatrixXd dT)
 {
-	return dR * sigma * R + R * sigma * dR;
+	return dT + dR * mean;
+}
+
+Eigen::Matrix3d Link::deriveSigma(const Eigen::MatrixXd dR)
+{
+	return dR * cov * R + R * cov * dR;
 }
 
 
-Eigen::MatrixXd Link::derivateRelativeRotation(const Eigen::Vector3d rotationAxis, const Eigen::MatrixXd rotation) {
+Eigen::Matrix3d Link::deriveRotation(const Eigen::Vector3d rotationAxis, const Eigen::MatrixXd rotation) {
   Eigen::MatrixXd skewedRotationAxis (rotation.rows(), rotation.cols());
   skewedRotationAxis << 0, -rotationAxis(2), rotationAxis(1),
                 rotationAxis(2), 0, -rotationAxis(0),
@@ -43,6 +54,6 @@ Eigen::MatrixXd Link::derivateRelativeRotation(const Eigen::Vector3d rotationAxi
 
 void Link::printParameters()
 {
-  std::cout << "\u03BC = \n" << mMean << '\n';
-  std::cout << "\u03A3 = \n" << mCov << std::endl;
+  std::cout << "\u03BC = \n" << mean << '\n';
+  std::cout << "\u03A3 = \n" << cov << std::endl;
 }
